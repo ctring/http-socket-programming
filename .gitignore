@@ -53,3 +53,8 @@ dkms.conf
 
 # Editor files
 .vscode
+
+# Others
+*.pdf
+body.html
+experiment/
