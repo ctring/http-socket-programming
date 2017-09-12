@@ -238,7 +238,8 @@ sem_t sem;
 
 void* handle_connection(void *argument)
 {
-    int sockfd = *((int*)argument);
+    int* sockfdPtr = (int*)argument;
+    int sockfd = *sockfdPtr;
     int bytesRcvd;
     char *request = NULL;
     char *header = NULL;
@@ -254,6 +255,7 @@ void* handle_connection(void *argument)
    
     free(request);
     free(header);
+    free(sockfdPtr);
     close(sockfd);
     sem_post(&sem);
     return NULL;
@@ -263,7 +265,8 @@ int main(int argc, char *argv[])
 {
     pthread_t thread;
     
-    int sockfd, newfd;
+    int sockfd;
+    int *newfd;
     struct sockaddr_storage clientAddr;    
     socklen_t sin_size;
     struct sigaction sa;
@@ -291,7 +294,8 @@ int main(int argc, char *argv[])
     sem_init(&sem, 0, NUM_THREADS);
     while (1) {
         sin_size = sizeof clientAddr;
-        newfd = accept(sockfd, (struct sockaddr *)&clientAddr, &sin_size);
+        newfd = (int*)malloc(sizeof(int));
+        *newfd = accept(sockfd, (struct sockaddr *)&clientAddr, &sin_size);
         if (newfd < 0) {
             perror("accept");
             continue;
@@ -303,7 +307,7 @@ int main(int argc, char *argv[])
             s, sizeof s);
         printf("server: got connection from %s\n", s);
         
-        pthread_create(&thread, NULL, handle_connection, &newfd);
+        pthread_create(&thread, NULL, handle_connection, newfd);
     }
     return 0;
 }
