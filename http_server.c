@@ -313,5 +313,6 @@ int main(int argc, char *argv[])
         
         pthread_create(&thread, NULL, handle_connection, newfd);
     }
+    close(sockfd);
     return 0;
 }
