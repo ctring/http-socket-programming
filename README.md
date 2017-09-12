@@ -16,7 +16,7 @@ make
 ```
 ./http_client [-p] <host> <port>
 ```
-With `-p` option, the RTT for connecting to the host will be displayed.
+`-p` - print the RTT for connecting to the host
 
 ### Server
 ```
