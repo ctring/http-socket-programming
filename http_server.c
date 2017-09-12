@@ -172,6 +172,7 @@ int send_http_response(int sockfd, const char *request, const char *reqHeader)
     
     resHeader[0] = '\0';
 
+    // This is unsafe but I'm lazy
     sscanf(request, "%s %s %s", method, uri, httpVersion);
     if (strcmp("GET", method) != 0)
     {
@@ -182,6 +183,9 @@ int send_http_response(int sockfd, const char *request, const char *reqHeader)
         statusCode = 505;
     }
     else {
+        if (strcmp(uri, "/") == 0) {
+            strcpy(uri, "/index.html");
+        }
         file = fopen(uri + 1, "rb");
         if (file) {
             body = (char*)malloc(BODY_SIZE);
