@@ -41,7 +41,7 @@ int open_socket_and_connect(const char *serverName, const char *portNumber)
 
     // Get host information
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     if ((ecode = getaddrinfo(serverName, portNumber, &hints, &servInfo)) != 0)
@@ -50,10 +50,13 @@ int open_socket_and_connect(const char *serverName, const char *portNumber)
         return -1;
     }
 
-
     // Try to connect to the first working address spec
     for (p = servInfo; p != NULL; p = p->ai_next) 
     {
+        inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+                  ipAddress, sizeof ipAddress);
+    
+        printf("client: connecting to %s\n", ipAddress);
         if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
         {
             perror("client: socket");
@@ -78,7 +81,7 @@ int open_socket_and_connect(const char *serverName, const char *portNumber)
 
     // Get readable IP address
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr), ipAddress, sizeof ipAddress);
-    printf("client: connecting to %s\n", ipAddress);
+    printf("client: connected to %s\n", ipAddress);
 
     if (printRTT) {
         printf("Round-trip time = %.2f ms\n", rtt);
