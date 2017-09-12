@@ -50,7 +50,6 @@ int open_socket_and_connect(const char *serverName, const char *portNumber)
         return -1;
     }
 
-    start_timer();
 
     // Try to connect to the first working address spec
     for (p = servInfo; p != NULL; p = p->ai_next) 
@@ -60,16 +59,16 @@ int open_socket_and_connect(const char *serverName, const char *portNumber)
             perror("client: socket");
             continue;
         }
+        start_timer();
         if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1)
         {
             close(sockfd);
             perror("client: socket");
             continue;
         }
+        rtt = end_timer();
         break;
     }
-  
-    rtt = end_timer();
 
     if (p == NULL)
     {
